@@ -1,0 +1,74 @@
+.App {
+  text-align: center;
+}
+
+.App-logo {
+  animation: App-logo-spin infinite 20s linear;
+  height: 80px;
+}
+
+.App-header {
+  background-color: rgb(252, 32, 70);
+  height: 150px;
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.App-title {
+  font-size: 32;
+  font-family: sans-serif;
+}
+
+.Login-form {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+}
+
+.App-intro {
+  font-size: large;
+}
+
+.Square-list {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.Square {
+  margin: 10px;
+}
+.Category-image {
+  margin-top: 5px;
+  border-radius: 10px;
+  height: 100px;
+}
+
+/* Gets rid of grey border when user clicks */
+.No-focus:focus {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  box-shadow: none !important;
+  background-clip: padding-box;
+  outline: none;   
+}
+
+.Square-button {
+  background-color: white;
+  border-radius: 5px;
+  border-color: lightgrey;
+}
+
+/* When user hovers mouse over Square */
+.Square:hover {
+  border-color: rgb(252, 32, 70);
+}
+
+
+@keyframes App-logo-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
