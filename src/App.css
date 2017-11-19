@@ -67,6 +67,29 @@
   border-color: rgb(252, 32, 70);
 }
 
+.Food-item {
+  width: "90%";
+}
+
+.Food-item-button {
+  width: 500px;
+  background-color: white;
+  border-radius: 5px;
+  border-color: lightgrey;
+  
+}
+
+.Food-item-button:hover {
+  border-color: rgb(252, 32, 70);
+}
+
+.Food-list {
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: wrap;
+  flex-direction: column;
+}
+
 
 @keyframes App-logo-spin {
   from { transform: rotate(0deg); }
