@@ -14,6 +14,7 @@ class App extends Component {
       password: null,
       isRegistering: false,
       isLoggedin: false,
+      isCreatingProduct: false,
       username: null,
       IdNo: null,
       phone: null,
@@ -131,7 +132,11 @@ class App extends Component {
               setLoggedIn={this.setRegisterState}
               isLoggedin={this.state.isLoggedin}
               isRegistering={this.state.isRegistering}
-              />) : (<div>Welcome, {this.state.name}!</div>)}
+              />) : (
+              <div>
+                Welcome, {this.state.name}!
+                <button onClick={ () => this.setState({isCreatingProduct: true})}> Add Product </button>
+              </div>)}
           </div>
         </header>
         {/* The user hits the register button */}
@@ -165,9 +170,19 @@ class App extends Component {
           </div>
           )
         }
+        {
+          this.state.isLoggedin && this.state.isCreatingProduct && (
+            <div>
+              <div> Add product information </div>
+              <button onClick={ () => this.setState({isCreatingProduct: false})}> Create </button>
+            </div>
+          )
+          
+
+        }
         {/* default displaying all products */}
         {
-          !this.state.isLoggedIn && !this.state.isRegistering && (
+          !this.state.isLoggedIn && !this.state.isRegistering && !this.state.isCreatingProduct && (
             <div>Products here</div>
           )
         }

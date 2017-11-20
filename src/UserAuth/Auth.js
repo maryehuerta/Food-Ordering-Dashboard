@@ -2,6 +2,7 @@ import React, { Component, button, input } from 'react';
 
 class Auth extends Component {
 		render() {
+			// Show login screen in header
 			if (!this.props.isLoggedIn && !this.props.isRegistering) {
 			return (
 				<div>
@@ -16,6 +17,7 @@ class Auth extends Component {
 				</div>
 			)
 		}
+		// Show nothing in header (Register is in body)
 		if (!this.props.isLoggedIn && this.props.isRegistering) {
 			return (
 				<div>
