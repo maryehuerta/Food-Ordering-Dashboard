@@ -20,7 +20,17 @@ class App extends Component {
       phone: null,
       address: null,
       food: [],
-      name: null
+      name: null,
+      isSalad: 0,
+      isAppetizer: 0,
+      isBeverage: 0,
+      isDessert: 0,
+      isMainDish: 0,
+      selectedOption: "Salad",
+      productName: null,
+      productDescription: null,
+      productImage: null,
+      productPrice: null
     };
   }
  
@@ -100,12 +110,84 @@ class App extends Component {
     // this.setState({isLoggedin: true, isRegistering: false})
   }
 
+  _createProduct = () => {
+    const { 
+      productName,
+      productDescription,
+      productImage,
+      productPrice,
+      isAppetizer,
+      isBeverage,
+      isDessert,
+      isMainDish,
+      isSalad } = this.state
+    
+    if (productName === null) {
+      window.alert("Enter a Product Name")
+      return false;
+    } else if (productImage  === null) {
+      window.alert("Enter a Product Image")
+      return false;
+    } else if (productDescription  === null) {
+      window.alert("Enter a Product Decription")
+      return false;
+    } else if (productPrice === null) {
+      window.alert("Enter a Price")
+      return false;
+    }
+    
+    fetch('http://localhost:3000/products/new', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(
+        {
+          Product_Image: productImage,
+          Description: productDescription,
+          Price: productPrice, 
+          isSalad: isSalad, 
+          isMainDish: isMainDish, 
+          isDessert: isDessert,
+          isAppetizer: isAppetizer,
+          isBeverage: isBeverage,
+          ProductName: productName,
+        })
+    }).then((res) => (
+      res.json()
+    )).then((res) => {
+      console.log(res)
+      this.setState({ProductID: res[0], isCreatingProduct: false})
+    }).catch((err) => window.alert(err))
+    
+  }
+
   handleEmail = (e) => {
     this.setState({email: e.target.value})
   }
 
   handlePassword = (e) => {
     this.setState({password: e.target.value})
+  }
+
+
+  handleOptionChange = (changeEvent) => {
+    
+    this.setState({
+      selectedOption: changeEvent.target.value,
+      isSalad: 0,
+      isAppetizer: 0,
+      isBeverage: 0,
+      isMainDish: 0,
+      isDessert: 0,
+    })
+
+    // Change the selected values boolean to true by creating an object to pass into the state
+    const key = `is${changeEvent.target.value}`
+    var obj  = {}
+    obj[key] = 1
+    console.log(key)
+    this.setState(obj)
   }
   
   setRegisterState = () => {
@@ -115,6 +197,7 @@ class App extends Component {
   userLoggedIn = () => {
     this.setState({isRegistering: false, isLoggedin: true})
   }
+
 
   render() {
 
@@ -174,7 +257,47 @@ class App extends Component {
           this.state.isLoggedin && this.state.isCreatingProduct && (
             <div>
               <div> Add product information </div>
-              <button onClick={ () => this.setState({isCreatingProduct: false})}> Create </button>
+                <input onChange={(e) => {this.setState({productName: e.target.value})}}
+                  placeholder="Product Name" />
+                <input onChange={(e) => {this.setState({productImage: e.target.value})}}
+                  placeholder="Product Image Url" />
+                <input onChange={(e) => {this.setState({productDescription: e.target.value})}}
+                  placeholder="Description" />
+                <input onChange={(e) => {this.setState({productPrice: e.target.value})}}
+                  placeholder="Price" />
+                 <form>
+                  <div className="radio">
+                    <label>
+                      <input type="radio" value="Salad" checked={this.state.selectedOption === "Salad" } onChange={this.handleOptionChange} />
+                      Salad
+                    </label>
+                  </div>
+                  <div className="radio">
+                    <label>
+                      <input type="radio" value="MainDish" checked={this.state.selectedOption === "MainDish" } onChange={this.handleOptionChange}/>
+                      MainDish
+                    </label>
+                  </div>
+                  <div className="radio">
+                    <label>
+                      <input type="radio" value="Dessert" checked={this.state.selectedOption === "Dessert" } onChange={this.handleOptionChange}/>
+                      Dessert
+                    </label>
+                  </div>
+                  <div className="radio">
+                    <label>
+                      <input type="radio" value="Appetizer" checked={this.state.selectedOption === "Appetizer" } onChange={this.handleOptionChange}/>
+                      Appetizer
+                    </label>
+                  </div>
+                  <div className="radio">
+                    <label>
+                      <input type="radio" value="Beverage" checked={this.state.selectedOption === "Beverage" } onChange={this.handleOptionChange}/>
+                      Beverage
+                    </label>
+                  </div>
+                </form>
+              <button onClick={ this._createProduct}> Create </button>
             </div>
           )
           
