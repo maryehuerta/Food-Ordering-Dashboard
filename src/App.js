@@ -1,7 +1,6 @@
 import React, { Component, button, input } from 'react';
 import './App.css';
 import Auth from './UserAuth/Auth'
-import Register from './UserAuth/Register'
 
 
 class App extends Component {
@@ -50,7 +49,6 @@ class App extends Component {
   componentWillMount() {
     this.loadProducts()
   }
-  
 
   loadProducts = () => {
     fetch('http://localhost:8080/products').then((products) => products.json()).then((products) => {
@@ -58,7 +56,6 @@ class App extends Component {
       console.log(this.state.food)
     })
   }
- 
 
   _login = () => {
     const {email, password} = this.state;
@@ -331,6 +328,7 @@ class App extends Component {
         {
           this.state.isLoggedin && this.state.isCreatingProduct && (
             <div>
+              <button onClick={ () => {this.setState({isCreatingProduct: false})}}> Back </button>
               <div> Add product information </div>
                 <input onChange={(e) => {this.setState({productName: e.target.value})}}
                   placeholder="Product Name" />
@@ -380,17 +378,24 @@ class App extends Component {
         {
           !this.state.isLoggedIn && !this.state.isRegistering && !this.state.isCreatingProduct && !this.state.isOrdering && (
             this.state.isFoodVisible && this.state.food.map((foodItem) => (
-              <button key={foodItem.ProductId} onClick={()=>this.handleOrder(foodItem)} >
-                <div>
-                {foodItem.ProductName}
+              <button className="Food-button" key={foodItem.ProductId} onClick={()=>this.handleOrder(foodItem)} >
+                <div className="Button-format">
+                  <div>
+                    <img src={foodItem.Product_Image} alt={"hi"} height={350} width={400}/>
+                  </div>
+                  <div className="Button-detail">
+                    <div>
+                    {foodItem.ProductName}
+                    </div>
+                    <div>
+                    ${foodItem.Price}
+                    </div>
+                    <div>
+                    {foodItem.Description}
+                    </div>
+                  </div>
                 </div>
-                <img src={foodItem.Product_Image} alt={"hi"} height={350} width={400}/>
-                <div>
-                ${foodItem.Price}
-                </div>
-                <div>
-                {foodItem.Description}
-                </div>
+                
               </button>
             ))
           )
@@ -398,8 +403,9 @@ class App extends Component {
         {
           !this.state.isLoggedIn && !this.state.isRegistering && !this.state.isCreatingProduct && this.state.isOrdering && (
             <div>
+              <button onClick={ () => {this.setState({isOrdering: false})}}> Back </button>
               <div> Create an Order </div>
-              <img src={this.state.choosenProduct.Product_Image} />
+              <img src={this.state.choosenProduct.Product_Image} alt={"hi"} />
               <p>price: ${this.state.choosenProduct.Price} * {this.state.Quantity || 0} = ${this.state.Quantity * this.state.choosenProduct.Price}</p>
               <input onChange={(e) => {this.setState({Quantity: e.target.value})}}
                   placeholder="Quantity" />
@@ -412,6 +418,7 @@ class App extends Component {
         {
           this.state.isPaying && !this.state.isFoodVisible && (
             <div>
+              <button onClick={ () => {this.setState({isPaying: false, isOrdering: true})}}> Back </button>
               <div> Credit Card </div>
               <p>Total: ${this.state.total}</p>
               <input onChange={(e) => {this.setState({credit: e.target.value})}} placeholder="credit card" max={16} />

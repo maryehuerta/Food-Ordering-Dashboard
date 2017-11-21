@@ -21,74 +21,46 @@
   font-family: sans-serif;
 }
 
-.Login-form {
+button {
+  background-color: rgba(0, 0, 0, .0);
+  border-color: rgba(255, 255, 255, 0.9);
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 16px;
+}
+
+.Food-button {
+  background-color: rgba(0, 0, 0, .0);
+  color: #333;
+  border-color: rgba(43, 40, 40, 0.267);
+  margin: 20px;
+  width: 450px;
+  font-size: 17px;
+}
+
+.Button-format {
   display: flex;
-  flex-direction: column;
   justify-content: space-around;
-}
-
-.App-intro {
-  font-size: large;
-}
-
-.Square-list {
-  display: flex;
-  align-items: flex-start;
-  justify-content: center;
-  flex-wrap: wrap;
-}
-
-.Square {
-  margin: 10px;
-}
-.Category-image {
-  margin-top: 5px;
-  border-radius: 10px;
-  height: 100px;
-}
-
-/* Gets rid of grey border when user clicks */
-.No-focus:focus {
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  box-shadow: none !important;
-  background-clip: padding-box;
-  outline: none;   
-}
-
-.Square-button {
-  background-color: white;
-  border-radius: 5px;
-  border-color: lightgrey;
-}
-
-/* When user hovers mouse over Square */
-.Square:hover {
-  border-color: rgb(252, 32, 70);
-}
-
-.Food-item {
-  width: "90%";
-}
-
-.Food-item-button {
-  width: 500px;
-  background-color: white;
-  border-radius: 5px;
-  border-color: lightgrey;
   
 }
+.Button-detail {
+  display: flex;
+  justify-content: center;
+  align-items: space-around;
+  width: 250px;
+  flex-direction: column;
+  
+}
+img {
+  width: 100px;
+  height: 100px;
+  border-radius: 15px;
+  padding: 10px;
+}
 
-.Food-item-button:hover {
+.Food-button:hover {
   border-color: rgb(252, 32, 70);
 }
 
-.Food-list {
-  display: flex;
-  justify-content: space-around;
-  flex-wrap: wrap;
-  flex-direction: column;
-}
 
 
 @keyframes App-logo-spin {
