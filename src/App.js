@@ -9,36 +9,61 @@ class App extends Component {
     super(props);
 
     this.state = {
-      user: null,
-      email: null,
-      password: null,
       isRegistering: false,
       isLoggedin: false,
       isCreatingProduct: false,
+      isOrdering: false,
+      isPaying: false,
+      isFoodVisible: true,
+
+      user: null,      
       username: null,
+      email: null,
+      password: null,
       IdNo: null,
       phone: null,
       address: null,
-      food: [],
       name: null,
+      credit: null,
+
+      food: [],      
       isSalad: 0,
       isAppetizer: 0,
       isBeverage: 0,
       isDessert: 0,
       isMainDish: 0,
       selectedOption: "Salad",
+
       productName: null,
       productDescription: null,
       productImage: null,
-      productPrice: null
+      productPrice: null,
+      
+      Quantity: null,
+      choosenProduct: null,
+      total: 0,
+      orderId: null
     };
+  }
+
+  
+  componentWillMount() {
+    this.loadProducts()
+  }
+  
+
+  loadProducts = () => {
+    fetch('http://localhost:8080/products').then((products) => products.json()).then((products) => {
+      this.setState({food: products})
+      console.log(this.state.food)
+    })
   }
  
 
   _login = () => {
     const {email, password} = this.state;
 
-    fetch('http://localhost:3000/login', {
+    fetch('http://localhost:8080/login', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -72,7 +97,7 @@ class App extends Component {
     if (address === null || address.length > 255 ) {
       window.alert("Address should be at max 255 characters")
       return false;
-    } else if (phone === null || phone.length != 12) {
+    } else if (phone === null || phone.length !== 12) {
       window.alert(" Phone number should be in format ###-###-####")
       return false
     } else if (email === null || email.length > 100) {
@@ -87,7 +112,7 @@ class App extends Component {
     }
 
     // Call the server
-    fetch('http://localhost:3000/register', {
+    fetch('http://localhost:8080/register', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -136,7 +161,7 @@ class App extends Component {
       return false;
     }
     
-    fetch('http://localhost:3000/products/new', {
+    fetch('http://localhost:8080/products/new', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -162,6 +187,49 @@ class App extends Component {
     
   }
 
+  _createPayment = () => {
+    console.log(this.state.choosenProduct)
+    this.setState({isOrdering: false, isPaying: true, isFoodVisible: false, total: this.state.Quantity * this.state.choosenProduct.Price})
+  }
+
+  _createOrder = () => {
+    const { 
+      choosenProduct,
+      total,
+      credit,
+      IdNo,
+      Quantity
+     } = this.state
+     if (credit === null) {
+      window.alert("Enter a valid credit card number")
+      return false;
+    }
+
+    fetch('http://localhost:8080/orders/new', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(
+        {
+          product_id: choosenProduct.ProductId,
+          customer_id: IdNo,
+          quantity: Quantity,
+          total_price: total,
+          credit_card_number: credit
+        })
+    }).then((res) => (
+      res.json()
+    )).then((res) => {
+      console.log(res)
+      this.setState({orderId: res[0], isPaying: false, isFoodVisible: true})
+      window.alert("Order Complete! Have a nice day!")
+   }).catch((err) => window.alert(err))
+
+
+    
+  }
+
   handleEmail = (e) => {
     this.setState({email: e.target.value})
   }
@@ -170,6 +238,13 @@ class App extends Component {
     this.setState({password: e.target.value})
   }
 
+  handleOrder = (choosenProduct) => {
+    if(!this.state.isLoggedin) {
+      window.alert("Please login to create an order")
+      return false;
+    }
+    this.setState({isOrdering: true, choosenProduct })
+  }
 
   handleOptionChange = (changeEvent) => {
     
@@ -300,13 +375,48 @@ class App extends Component {
               <button onClick={ this._createProduct}> Create </button>
             </div>
           )
-          
-
         }
         {/* default displaying all products */}
         {
-          !this.state.isLoggedIn && !this.state.isRegistering && !this.state.isCreatingProduct && (
-            <div>Products here</div>
+          !this.state.isLoggedIn && !this.state.isRegistering && !this.state.isCreatingProduct && !this.state.isOrdering && (
+            this.state.isFoodVisible && this.state.food.map((foodItem) => (
+              <button key={foodItem.ProductId} onClick={()=>this.handleOrder(foodItem)} >
+                <div>
+                {foodItem.ProductName}
+                </div>
+                <img src={foodItem.Product_Image} alt={"hi"} height={350} width={400}/>
+                <div>
+                ${foodItem.Price}
+                </div>
+                <div>
+                {foodItem.Description}
+                </div>
+              </button>
+            ))
+          )
+        }
+        {
+          !this.state.isLoggedIn && !this.state.isRegistering && !this.state.isCreatingProduct && this.state.isOrdering && (
+            <div>
+              <div> Create an Order </div>
+              <img src={this.state.choosenProduct.Product_Image} />
+              <p>price: ${this.state.choosenProduct.Price} * {this.state.Quantity || 0} = ${this.state.Quantity * this.state.choosenProduct.Price}</p>
+              <input onChange={(e) => {this.setState({Quantity: e.target.value})}}
+                  placeholder="Quantity" />
+
+              <button onClick={this._createPayment}> Proceed to Payment </button>
+            </div>
+          )
+        }
+
+        {
+          this.state.isPaying && !this.state.isFoodVisible && (
+            <div>
+              <div> Credit Card </div>
+              <p>Total: ${this.state.total}</p>
+              <input onChange={(e) => {this.setState({credit: e.target.value})}} placeholder="credit card" max={16} />
+              <button onClick={this._createOrder}> Place order </button>
+          </div>
           )
         }
       </div>
