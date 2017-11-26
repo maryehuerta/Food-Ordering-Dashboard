@@ -229,6 +229,7 @@ class App extends Component {
 
   handleEmail = (e) => {
     this.setState({email: e.target.value})
+
   }
 
   handlePassword = (e) => {
@@ -261,6 +262,39 @@ class App extends Component {
     console.log(key)
     this.setState(obj)
   }
+
+  deleteAccount = () => {
+  
+    window.localStorage.clear();
+
+    fetch('http://localhost:8080/users/delete', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(
+        {
+          IdNo: this.state.IdNo
+        })
+    }).then((res) => (
+      res.json()
+    )).then((res) => {
+      console.log(res)
+      this.setState({
+        user: null,      
+        username: null,
+        email: null,
+        password: null,
+        IdNo: null,
+        phone: null,
+        address: null,
+        name: null,
+        credit: null,
+        isLoggedin: false
+      })
+    }).catch((err) => window.alert(err))
+
+  }
   
   setRegisterState = () => {
     this.setState({isRegistering: true})
@@ -290,7 +324,8 @@ class App extends Component {
               />) : (
               <div>
                 Welcome, {this.state.name}!
-                <button onClick={ () => this.setState({isCreatingProduct: true})}> Add Product </button>
+                <button onClick= { () => this.setState({isCreatingProduct: true})}> Add Product </button>
+                <button onClick= { () => this.deleteAccount()}> Delete Account </button>
               </div>)}
           </div>
         </header>
@@ -321,14 +356,14 @@ class App extends Component {
                 type="phone"
                 placeholder="phone number" />
 
-            <button onClick={this._register} className="No-focus"> Register </button>
+            <button onClick={this._register} className="No-focus Red-button"> Register </button>
           </div>
           )
         }
         {
           this.state.isLoggedin && this.state.isCreatingProduct && (
             <div>
-              <button onClick={ () => {this.setState({isCreatingProduct: false})}}> Back </button>
+              <button className="Red-button" onClick={ () => {this.setState({isCreatingProduct: false})}}> Back </button>
               <div> Add product information </div>
                 <input onChange={(e) => {this.setState({productName: e.target.value})}}
                   placeholder="Product Name" />
@@ -370,13 +405,13 @@ class App extends Component {
                     </label>
                   </div>
                 </form>
-              <button onClick={ this._createProduct}> Create </button>
+              <button className="Red-button" onClick={ this._createProduct}> Create </button>
             </div>
           )
         }
         {/* default displaying all products */}
         {
-          !this.state.isLoggedIn && !this.state.isRegistering && !this.state.isCreatingProduct && !this.state.isOrdering && (
+          !this.state.isPaying && !this.state.isLoggedIn && !this.state.isRegistering && !this.state.isCreatingProduct && !this.state.isOrdering && (
             this.state.isFoodVisible && this.state.food.map((foodItem) => (
               <button className="Food-button" key={foodItem.ProductId} onClick={()=>this.handleOrder(foodItem)} >
                 <div className="Button-format">
@@ -403,14 +438,14 @@ class App extends Component {
         {
           !this.state.isLoggedIn && !this.state.isRegistering && !this.state.isCreatingProduct && this.state.isOrdering && (
             <div>
-              <button onClick={ () => {this.setState({isOrdering: false})}}> Back </button>
+              <button className="Red-button" onClick={ () => {this.setState({isOrdering: false})}}> Back </button>
               <div> Create an Order </div>
               <img src={this.state.choosenProduct.Product_Image} alt={"hi"} />
               <p>price: ${this.state.choosenProduct.Price} * {this.state.Quantity || 0} = ${this.state.Quantity * this.state.choosenProduct.Price}</p>
               <input onChange={(e) => {this.setState({Quantity: e.target.value})}}
                   placeholder="Quantity" />
 
-              <button onClick={this._createPayment}> Proceed to Payment </button>
+              <button className="Red-button" onClick={this._createPayment}> Proceed to Payment </button>
             </div>
           )
         }
@@ -418,11 +453,11 @@ class App extends Component {
         {
           this.state.isPaying && !this.state.isFoodVisible && (
             <div>
-              <button onClick={ () => {this.setState({isPaying: false, isOrdering: true})}}> Back </button>
+              <button className="Red-button" onClick={ () => {this.setState({isPaying: false, isOrdering: false, isFoodVisible: true})}}> Back </button>
               <div> Credit Card </div>
               <p>Total: ${this.state.total}</p>
               <input onChange={(e) => {this.setState({credit: e.target.value})}} placeholder="credit card" max={16} />
-              <button onClick={this._createOrder}> Place order </button>
+              <button className="Red-button" onClick={this._createOrder}> Place order </button>
           </div>
           )
         }

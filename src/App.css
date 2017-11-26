@@ -28,6 +28,12 @@ button {
   font-size: 16px;
 }
 
+.Red-button {
+  background-color: rgba(0, 0, 0, .0);
+  border-color: rgb(252, 32, 70);
+  color: rgb(252, 32, 70);
+}
+
 .Food-button {
   background-color: rgba(0, 0, 0, .0);
   color: #333;
@@ -60,7 +66,6 @@ img {
 .Food-button:hover {
   border-color: rgb(252, 32, 70);
 }
-
 
 
 @keyframes App-logo-spin {
