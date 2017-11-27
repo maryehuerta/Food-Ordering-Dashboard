@@ -38,7 +38,8 @@ class App extends Component {
       productDescription: null,
       productImage: null,
       productPrice: null,
-      
+      productId: null,
+
       Quantity: null,
       choosenProduct: null,
       total: 0,
@@ -46,11 +47,11 @@ class App extends Component {
     };
   }
 
-  
   componentWillMount() {
     this.loadProducts()
   }
 
+  // Fetch products from the database
   loadProducts = () => {
     fetch('http://localhost:8080/products').then((products) => products.json()).then((products) => {
       this.setState({food: products})
@@ -58,6 +59,9 @@ class App extends Component {
     })
   }
 
+  // Compares login information entered with login of the database
+  // If the user name and password match it returns the 
+  // user's information
   _login = () => {
     const {email, password} = this.state;
 
@@ -88,6 +92,7 @@ class App extends Component {
     })
   }
 
+  // Registers a new user 
   _register = () => {
     // Destructure our state
     const {address, phone, email, username, password, name} = this.state
@@ -133,6 +138,7 @@ class App extends Component {
     // this.setState({isLoggedin: true, isRegistering: false})
   }
 
+  // Creates a product
   _createProduct = () => {
     const { 
       productName,
@@ -145,6 +151,7 @@ class App extends Component {
       isMainDish,
       isSalad } = this.state
     
+      // Validates information in input boxes
     if (productName === null) {
       window.alert("Enter a Product Name")
       return false;
@@ -158,7 +165,7 @@ class App extends Component {
       window.alert("Enter a Price")
       return false;
     }
-    
+    // 
     fetch('http://localhost:8080/products/new', {
       method: 'POST',
       headers: {
@@ -185,24 +192,27 @@ class App extends Component {
     
   }
 
+  // Updates the state with order information ie the product and the total
   _createPayment = () => {
     console.log(this.state.choosenProduct)
     this.setState({isOrdering: false, isPaying: true, isFoodVisible: false, total: this.state.Quantity * this.state.choosenProduct.Price})
   }
 
+  // Creates an order 
   _createOrder = () => {
     const { 
       choosenProduct,
-      total,
-      credit,
+      total, //order total
+      credit, //credit card information
       IdNo,
-      Quantity
+      Quantity 
      } = this.state
+     // Validate credit card information
      if (credit === null) {
       window.alert("Enter a valid credit card number")
       return false;
     }
-
+    //Calls the server
     fetch('http://localhost:8080/orders/new', {
       method: 'POST',
       headers: {
@@ -220,33 +230,33 @@ class App extends Component {
       res.json()
     )).then((res) => {
       console.log(res)
-      this.setState({orderId: res[0], isPaying: false, isFoodVisible: true})
+      this.setState({orderId: res[0], isPaying: false, isFoodVisible: true}) //the database assigns an order id and the server sends it back as res[0]
       window.alert("Order Complete! Have a nice day!")
    }).catch((err) => window.alert(err))
-
-
-    
   }
 
+  // Updates the state with the email address of the user when they type in the email input box during login
   handleEmail = (e) => {
     this.setState({email: e.target.value})
 
   }
-
+  // Updates the state with the password  of the user when they type in the password input box during login
   handlePassword = (e) => {
     this.setState({password: e.target.value})
   }
 
+  //Updates the state so the user is brought to the order page
   handleOrder = (choosenProduct) => {
+    // Validates if the user is logged in before creating an order
     if(!this.state.isLoggedin) {
       window.alert("Please login to create an order")
       return false;
     }
     this.setState({isOrdering: true, choosenProduct })
   }
-
+  // When the radio buttons are pressed during CreateProduct and UpdateProduct this updates the state
   handleOptionChange = (changeEvent) => {
-    
+
     this.setState({
       selectedOption: changeEvent.target.value,
       isSalad: 0,
@@ -264,11 +274,12 @@ class App extends Component {
     this.setState(obj)
   }
 
+  // Deletes a User
   deleteAccount = () => {
-    // console.log(this.state.IdNo)
-    // const IdNo = this.state.IdNo;
+    //Clears local Storage
     window.localStorage.clear();
 
+    //Calls server and clears all user information in the state
     fetch('http://localhost:8080/users/delete', {
       method: 'POST',
       headers: {
@@ -296,7 +307,9 @@ class App extends Component {
 
   }
 
+  // If the user presses the edit button the product they want to edit is updated in the state
   handleEdit = (choosenProduct) => {
+    //Validates if the user is loggined 
     if(!this.state.isLoggedin) {
       window.alert("Please login to edit a product")
       return false;
@@ -315,16 +328,20 @@ class App extends Component {
      console.log(Object.keys(choosenProduct))
   }
   
+  // Updates the state to bring user to register page
   setRegisterState = () => {
     this.setState({isRegistering: true})
     
   }
 
+  // Updates state if the user is loggedin
   userLoggedIn = () => {
     this.setState({isRegistering: false, isLoggedin: true})
   }
 
+  // After a product is edited the server is called to update the product information
   handleEditSumbit = () => {
+    //Get's values of the state
     const { 
       productName,
       productDescription,
@@ -337,6 +354,8 @@ class App extends Component {
       isBeverage
      } = this.state
     
+
+    //Validates information entered
     if (productName === null) {
       window.alert("Enter a Product Name")
       return false;
@@ -350,15 +369,15 @@ class App extends Component {
       window.alert("Enter a Price")
       return false;
     }
-    console.log(this.state)
-    
-    fetch('http://localhost:8080/products/edit', {
+    //Calls the server and updates the product and the state
+    fetch('http://localhost:8080/products/update', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify(
         {
+          ProductId: this.state.choosenProduct.ProductId,
           Product_Image: productImage,
           Description: productDescription,
           Price: productPrice, 
@@ -372,9 +391,9 @@ class App extends Component {
     }).then((res) => (
       res.json()
     )).then((res) => {
-      console.log(res)
-      this.setState({isEditing: false})
-    }).catch((err) => window.alert(err))
+      this.loadProducts()
+      this.setState({isFoodVisible: true, isEditing: false})
+    }).catch((err) => err)
     
   }
 
@@ -383,6 +402,7 @@ class App extends Component {
 
     return (
       <div className="App">
+        {/* This is the title and login header */}
         <header className="App-header">
           <h1>Munchies</h1>
           <div>
@@ -405,7 +425,7 @@ class App extends Component {
               </div>)}
           </div>
         </header>
-        {/* The user hits the register button */}
+        {/* Registration Page: If the user hits the register button */}
         {
           !this.state.isLoggedIn && this.state.isRegistering && (
             <div>
@@ -436,6 +456,7 @@ class App extends Component {
           </div>
           )
         }
+        {/* Add Product Page if user hits addProduct button */}
         {
           this.state.isLoggedin && this.state.isCreatingProduct && (
             <div>
@@ -449,6 +470,7 @@ class App extends Component {
                   placeholder="Description" />
                 <input onChange={(e) => {this.setState({productPrice: e.target.value})}}
                   placeholder="Price" />
+                  {/* Radio Buttons for product types */}
                  <form>
                   <div className="radio">
                     <label>
@@ -485,11 +507,14 @@ class App extends Component {
             </div>
           )
         }
-        {/* default displaying all products */}
+        {/* Displays Products: default displaying all products */}
+        {/* Gets all the products from the state and displays them on the page*/}
+        <div className="Food-products-list">
         {
           !this.state.isPaying && !this.state.isLoggedIn && !this.state.isRegistering && !this.state.isCreatingProduct && !this.state.isOrdering && (
+            
             this.state.isFoodVisible && this.state.food.map((foodItem) => (
-              <div>
+              <div className="Food-div">
                  <button className="Food-button" key={foodItem.ProductId} onClick={()=>this.handleOrder(foodItem)} >
                 <div className="Button-format">
                   <div>
@@ -507,13 +532,15 @@ class App extends Component {
                     </div>
                   </div>
                 </div>
-                
               </button>
-              <button onClick = {()=> this.handleEdit(foodItem) } className="Red-button Red-Background"> edit </button>
+              <button onClick = {()=> this.handleEdit(foodItem) } className="Red-button Red-Background"> Edit {foodItem.ProductName} </button>
               </div>
             ))
           )
         }
+        </div>
+        
+        {/* Order Page : The user chooses a quanity of the specific product they chose */}
         {
           !this.state.isLoggedIn && !this.state.isRegistering && !this.state.isCreatingProduct && this.state.isOrdering && (
             <div>
@@ -528,7 +555,7 @@ class App extends Component {
             </div>
           )
         }
-
+        {/* Payment Page: Total is displayed and User enters in their credit card information */}
         {
           this.state.isPaying && !this.state.isFoodVisible && (
             <div>
@@ -540,20 +567,23 @@ class App extends Component {
           </div>
           )
         }
-
+        {/* Edit Product Page : User updates the product information */}
         {
           this.state.isEditing && this.state.isLoggedin && !this.state.isFoodVisible && (
             <div>
               <button className="Red-button" onClick={ () => {this.setState({isEditing: false, isFoodVisible:true})}}>back</button>
-              <p> Edit {this.state.ProductName} </p>
+              <p> Edit {this.state.choosenProduct.ProductName} </p>
+              <div>
+                <img src={this.state.choosenProduct.Product_Image} alt={" "} height={500} width={500}/>
+              </div>
               <input onChange={(e) => {this.setState({productName: e.target.value})}}
-                  value={this.state.choosenProduct.ProductName} />
+                  value={this.state.productName} />
                 <input onChange={(e) => {this.setState({productImage: e.target.value})}}
-                  value={this.state.choosenProduct.Product_Image} />
+                  value={this.state.productImage} />
                 <input onChange={(e) => {this.setState({productDescription: e.target.value})}}
-                  value={this.state.choosenProduct.Description} />
+                  value={this.state.productDescription} />
                 <input onChange={(e) => {this.setState({productPrice: e.target.value})}}
-                  value={this.state.choosenProduct.Price} />
+                  value={this.state.productPrice} />
                   <form>
                   <div className="radio">
                     <label>

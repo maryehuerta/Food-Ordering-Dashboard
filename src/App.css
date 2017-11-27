@@ -1,5 +1,6 @@
 .App {
   text-align: center;
+  
 }
 
 .App-logo {
@@ -15,6 +16,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 15px;
+  
 }
 
 .User-settings {
@@ -22,9 +24,10 @@
   flex-direction: column; 
 }
 
-.App-title {
-  font-size: 32;
-  font-family: sans-serif;
+h1 {
+  font-size: 62px;
+  font-family: 'Libre Barcode 128 Text', cursive;
+  font-weight: 10;
 }
 
 button {
@@ -44,6 +47,14 @@ input {
   box-shadow: none;
   border-color: white;
   margin: 5px;
+  
+}
+
+form {
+  display: flex;
+  justify-content: space-around;
+  flex-direction: column;
+
 }
 
 .Red-button {
@@ -60,16 +71,19 @@ input {
 .Red-Background:hover {
   color: white;
   background: rgb(190, 23, 54);
+  border-color: rgb(190, 23, 54);
 }
 
 .Food-button {
   background-color: rgba(0, 0, 0, .0);
   color: #333;
-  border-color: rgba(43, 40, 40, 0.267);
-  margin: 20px;
-  width: 450px;
+  margin: 0px;
+  width: 40%px;
   font-size: 17px;
+  border-color: rgba(43, 40, 40, 0.267);
+
 }
+
 
 .Button-format {
   display: flex;
@@ -95,7 +109,17 @@ img {
   border-color: rgb(252, 32, 70);
 }
 
+.Food-div {
+  display: flex;
+  flex-direction: column;
+  width: 300px;
+  margin: 10px;
+}
 
+.Food-products-list {
+  display: flex;
+  justify-content: center;
+}
 @keyframes App-logo-spin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
