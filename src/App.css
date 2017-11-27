@@ -14,6 +14,12 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  padding: 15px;
+}
+
+.User-settings {
+  display: flex;
+  flex-direction: column; 
 }
 
 .App-title {
@@ -26,12 +32,34 @@ button {
   border-color: rgba(255, 255, 255, 0.9);
   color: rgba(255, 255, 255, 0.9);
   font-size: 16px;
+  margin: 5px;
+}
+
+input {
+  color: red;
+  background: white;
+  padding: 3px;
+  border-radius: 5px;
+  border-bottom-width: 3px;
+  box-shadow: none;
+  border-color: white;
+  margin: 5px;
 }
 
 .Red-button {
   background-color: rgba(0, 0, 0, .0);
   border-color: rgb(252, 32, 70);
   color: rgb(252, 32, 70);
+}
+
+.Red-Background {
+  color: white;
+  background: rgb(252, 32, 70);
+}
+
+.Red-Background:hover {
+  color: white;
+  background: rgb(190, 23, 54);
 }
 
 .Food-button {

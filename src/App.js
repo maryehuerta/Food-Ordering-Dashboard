@@ -14,6 +14,7 @@ class App extends Component {
       isOrdering: false,
       isPaying: false,
       isFoodVisible: true,
+      isEditing: false,
 
       user: null,      
       username: null,
@@ -264,7 +265,8 @@ class App extends Component {
   }
 
   deleteAccount = () => {
-  
+    // console.log(this.state.IdNo)
+    // const IdNo = this.state.IdNo;
     window.localStorage.clear();
 
     fetch('http://localhost:8080/users/delete', {
@@ -276,9 +278,7 @@ class App extends Component {
         {
           IdNo: this.state.IdNo
         })
-    }).then((res) => (
-      res.json()
-    )).then((res) => {
+    }).then((res) => {
       console.log(res)
       this.setState({
         user: null,      
@@ -295,13 +295,87 @@ class App extends Component {
     }).catch((err) => window.alert(err))
 
   }
+
+  handleEdit = (choosenProduct) => {
+    if(!this.state.isLoggedin) {
+      window.alert("Please login to edit a product")
+      return false;
+    }
+    this.setState({
+      isEditing: true,
+      isFoodVisible: false,
+      choosenProduct: choosenProduct,
+      productName: choosenProduct.ProductName,
+      productDescription: choosenProduct.Description,
+      productImage: choosenProduct.Product_Image,
+      productPrice: choosenProduct.Price,
+
+     })
+
+     console.log(Object.keys(choosenProduct))
+  }
   
   setRegisterState = () => {
     this.setState({isRegistering: true})
+    
   }
 
   userLoggedIn = () => {
     this.setState({isRegistering: false, isLoggedin: true})
+  }
+
+  handleEditSumbit = () => {
+    const { 
+      productName,
+      productDescription,
+      productImage,
+      productPrice,
+      isSalad,
+      isMainDish,
+      isDessert,
+      isAppetizer,
+      isBeverage
+     } = this.state
+    
+    if (productName === null) {
+      window.alert("Enter a Product Name")
+      return false;
+    } else if (productImage  === null) {
+      window.alert("Enter a Product Image")
+      return false;
+    } else if (productDescription  === null) {
+      window.alert("Enter a Product Decription")
+      return false;
+    } else if (productPrice === null) {
+      window.alert("Enter a Price")
+      return false;
+    }
+    console.log(this.state)
+    
+    fetch('http://localhost:8080/products/edit', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(
+        {
+          Product_Image: productImage,
+          Description: productDescription,
+          Price: productPrice, 
+          isSalad: isSalad, 
+          isMainDish: isMainDish, 
+          isDessert: isDessert,
+          isAppetizer: isAppetizer,
+          isBeverage: isBeverage,
+          ProductName: productName,
+        })
+    }).then((res) => (
+      res.json()
+    )).then((res) => {
+      console.log(res)
+      this.setState({isEditing: false})
+    }).catch((err) => window.alert(err))
+    
   }
 
 
@@ -322,10 +396,12 @@ class App extends Component {
               isLoggedin={this.state.isLoggedin}
               isRegistering={this.state.isRegistering}
               />) : (
-              <div>
+              <div className="User-settings">
                 Welcome, {this.state.name}!
-                <button onClick= { () => this.setState({isCreatingProduct: true})}> Add Product </button>
-                <button onClick= { () => this.deleteAccount()}> Delete Account </button>
+                <div>
+                  <button onClick= { () => this.setState({isCreatingProduct: true})}> Add Product </button>
+                  <button onClick= { () => this.deleteAccount()}> Delete Account </button>
+                </div>
               </div>)}
           </div>
         </header>
@@ -413,7 +489,8 @@ class App extends Component {
         {
           !this.state.isPaying && !this.state.isLoggedIn && !this.state.isRegistering && !this.state.isCreatingProduct && !this.state.isOrdering && (
             this.state.isFoodVisible && this.state.food.map((foodItem) => (
-              <button className="Food-button" key={foodItem.ProductId} onClick={()=>this.handleOrder(foodItem)} >
+              <div>
+                 <button className="Food-button" key={foodItem.ProductId} onClick={()=>this.handleOrder(foodItem)} >
                 <div className="Button-format">
                   <div>
                     <img src={foodItem.Product_Image} alt={"hi"} height={350} width={400}/>
@@ -432,6 +509,8 @@ class App extends Component {
                 </div>
                 
               </button>
+              <button onClick = {()=> this.handleEdit(foodItem) } className="Red-button Red-Background"> edit </button>
+              </div>
             ))
           )
         }
@@ -459,6 +538,56 @@ class App extends Component {
               <input onChange={(e) => {this.setState({credit: e.target.value})}} placeholder="credit card" max={16} />
               <button className="Red-button" onClick={this._createOrder}> Place order </button>
           </div>
+          )
+        }
+
+        {
+          this.state.isEditing && this.state.isLoggedin && !this.state.isFoodVisible && (
+            <div>
+              <button className="Red-button" onClick={ () => {this.setState({isEditing: false, isFoodVisible:true})}}>back</button>
+              <p> Edit {this.state.ProductName} </p>
+              <input onChange={(e) => {this.setState({productName: e.target.value})}}
+                  value={this.state.choosenProduct.ProductName} />
+                <input onChange={(e) => {this.setState({productImage: e.target.value})}}
+                  value={this.state.choosenProduct.Product_Image} />
+                <input onChange={(e) => {this.setState({productDescription: e.target.value})}}
+                  value={this.state.choosenProduct.Description} />
+                <input onChange={(e) => {this.setState({productPrice: e.target.value})}}
+                  value={this.state.choosenProduct.Price} />
+                  <form>
+                  <div className="radio">
+                    <label>
+                      <input type="radio" value="Salad" checked={this.state.selectedOption === "Salad" } onChange={this.handleOptionChange} />
+                      Salad
+                    </label>
+                  </div>
+                  <div className="radio">
+                    <label>
+                      <input type="radio" value="MainDish" checked={this.state.selectedOption === "MainDish" } onChange={this.handleOptionChange}/>
+                      MainDish
+                    </label>
+                  </div>
+                  <div className="radio">
+                    <label>
+                      <input type="radio" value="Dessert" checked={this.state.selectedOption === "Dessert" } onChange={this.handleOptionChange}/>
+                      Dessert
+                    </label>
+                  </div>
+                  <div className="radio">
+                    <label>
+                      <input type="radio" value="Appetizer" checked={this.state.selectedOption === "Appetizer" } onChange={this.handleOptionChange}/>
+                      Appetizer
+                    </label>
+                  </div>
+                  <div className="radio">
+                    <label>
+                      <input type="radio" value="Beverage" checked={this.state.selectedOption === "Beverage" } onChange={this.handleOptionChange}/>
+                      Beverage
+                    </label>
+                  </div>
+                </form>
+                <button className="Red-button" onClick = { this.handleEditSumbit }> Submit </button>
+            </div>
           )
         }
       </div>
