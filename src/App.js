@@ -49,6 +49,47 @@ class App extends Component {
 
   componentWillMount() {
     this.loadProducts()
+    // this.createUsers()
+  }
+
+  // Random user generation automation!
+  createUsers = () => {
+    for(var i = 0 ; i < 20 ; i++){
+      fetch('https://randomuser.me/api/').then((res) => (
+        res.json()
+      ).then((res) => {
+        console.log(res.results[0])
+        let user = res.results[0]
+        const username = user.login.username
+        const email= user.email
+        const password = user.login.password
+        const phone= user.phone
+        const address= `${user.location.street} ${user.location.city} ${user.location.state} ${user.location.postcode}`
+        const name= `${user.name.first} ${user.name.last}`
+        fetch('http://localhost:8080/register', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(
+            {
+            name: name,
+            email: email,
+            password: password, 
+            address: address, 
+            username: username, 
+            phone: phone})
+        }).then((res) => (
+          res.json()
+        )).then((res) => {
+          console.log(res)
+          this.setState({IdNo: res[0], isLoggedin: true, isRegistering: false})
+        }).catch((err) => window.alert(err))
+      }).catch((err) => {
+        window.alert(err)
+      })
+    )
+  }
   }
 
   // Fetch products from the database
